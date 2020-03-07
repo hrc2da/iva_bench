@@ -1,0 +1,45 @@
+experiment_description: still no human data, increasing epochs. there was an error in the filter by metrics processor
+experiment_type: experiment_types.classification_experiment.DistopiaClassificationExperiment
+data:
+  backend: data_types.distopia_data.DistopiaData
+  #training_path: /home/dev/data/distopia/243_raw.pkl
+  training_path: /home/dev/data/distopia/100_for_243_design_targets_combined4.npy
+  training_labels_path: /home/dev/data/distopia/100_for_243_design_labels_combined4.npy
+  preprocessors: # these should be in the order you want them called
+    ['filter_by_metrics']
+  # test_path: /home/dev/data/distopia/team_logs/merged_logs.csv
+  # test_labels_path: /home/dev/data/distopia/team_logs/merged_logs_labels.csv
+  # test_preprocessors: ['unflatten_districts']
+  n_workers: 1
+  metric_names: ['population','pvi','compactness']
+  # window_size: 5
+  # window_step: 1
+  #slice_bounds: [0,1000]
+  test_proportion:
+    # the proportion of the data to save as test data
+    0.2
+random_seed:
+  42
+
+model:
+  backend: models.keras_nn.KerasSequential
+  type: Sequential
+  layers: 
+      - type: Conv2D
+        filters: 64
+        kernel_size: [1,5]
+        activation: 'relu'
+        input_shape: [72,8,1] # 72 counties + 5 outcomes, 8 districts, 5 steps
+      - type: Conv2D
+        filters: 32
+        kernel_size: [1,4]
+        activation: 'relu'
+      - type: Flatten
+      - type: Dense
+        units: 3
+        activation: 'tanh' # output is weight vector from -1 to 1
+  fit_params:
+    epochs: 50
+  loss: 'mean_squared_error'
+  optimizer: 'adam'
+  metrics: ['mse']

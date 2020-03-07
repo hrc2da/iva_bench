@@ -1,0 +1,42 @@
+experiment_description: This is a test using Anna's distopia data with the 243 network. I think I need to visualize somehow.
+experiment_type: classification_experiment.DistopiaClassificationExperiment()
+data:
+  backend: data_types.distopia_data.DistopiaData
+  #training_path: /home/dev/data/distopia/243_raw.pkl
+  training_path: /home/dev/data/distopia/100_for_243_design_targets_combined4.npy
+  training_labels_path: /home/dev/data/distopia/100_for_243_design_labels_combined4.npy
+  preprocessors: # these should be in the order you want them called
+    []
+  test_path: /home/dev/PycharmProjects/distopia_task_switcher/distopia/distopia/logs/anna_log.json
+  n_workers: 1
+  # window_size: 5
+  # window_step: 1
+  #slice_bounds: [0,1000]
+  test_proportion:
+    # the proportion of the data to save as test data
+    0.2
+random_seed:
+  42
+
+model:
+  backend: models.keras_nn.KerasSequential
+  type: Sequential
+  layers: 
+      - type: Conv2D
+        filters: 64
+        kernel_size: [1,5]
+        activation: 'relu'
+        input_shape: [72,8,1] # 72 counties + 5 outcomes, 8 districts, 5 steps
+      - type: Conv2D
+        filters: 32
+        kernel_size: [1,4]
+        activation: 'relu'
+      - type: Flatten
+      - type: Dense
+        units: 5
+        activation: 'tanh' # output is weight vector from -1 to 1
+  fit_params:
+    epochs: 10
+  loss: 'mean_squared_error'
+  optimizer: 'adam'
+  metrics: ['mse']

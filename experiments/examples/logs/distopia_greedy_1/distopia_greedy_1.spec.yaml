@@ -1,0 +1,28 @@
+# Each spec file is in yaml format
+
+experiment_description:
+    Greedy agent, Distopia Environment
+experiment_type:
+    experiment_types.agent_experiment.AgentExperiment
+agent:
+    agents.greedy_agent.GreedyAgent
+environment:
+    environments.distopia_environment.DistopiaEnvironment
+n_steps:
+    5
+environment_params:
+    metrics:
+      - population
+      - pvi
+      - compactness
+    env_name: # just an example
+        distopia
+agent_params:
+    num_metrics: # just tell the agent how many metrics there are for assertion purposes
+      3
+    task:
+      - 0
+      - 0
+      - 1
+random_seed:
+    42

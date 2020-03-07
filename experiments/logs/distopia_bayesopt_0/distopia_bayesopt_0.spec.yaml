@@ -1,0 +1,39 @@
+# Each spec file is in yaml format
+
+experiment_description:
+    Bayes opt agent, Distopia Environment
+experiment_type:
+    experiment_types.agent_experiment.AgentExperiment
+agent:
+    agents.bayesopt_agent.BayesOptAgent
+environment:
+    environments.distopia_environment.DistopiaEnvironment
+n_steps:
+    100
+environment_params:
+    metrics:
+      - population
+      - pvi
+      - compactness
+    env_name: # just an example
+        distopia
+agent_params:
+    optimizer_fn: forest_minimize
+    base_estimator: ET
+    n_random_starts: 10
+    verbose: True
+    n_points: 1000
+    xi: 0.01
+    kappa: 1.96
+    n_jobs: -1
+    
+    num_metrics: # just tell the agent how many metrics there are for assertion purposes
+      3
+    task:
+      - 0
+      - 0
+      - 1
+      - 0
+      - 1
+random_seed:
+    42

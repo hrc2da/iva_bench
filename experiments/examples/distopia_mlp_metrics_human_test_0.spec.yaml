@@ -1,0 +1,45 @@
+experiment_description: basic mlp on single-step metrics
+experiment_type: experiment_types.classification_experiment.DistopiaClassificationExperiment
+data:
+  backend: data_types.distopia_data.DistopiaData
+  #training_path: /home/dev/data/distopia/243_raw.pkl
+  training_path: /home/dev/data/distopia/100_for_243_design_targets_combined4.npy
+  training_labels_path: /home/dev/data/distopia/100_for_243_design_labels_combined4.npy
+  preprocessors: # these should be in the order you want them called
+    ['filter_by_metrics','sliding_window']
+  test_path: /home/dev/data/distopia/team_logs/metrics/merged_logs.csv
+  test_labels_path: /home/dev/data/distopia/team_logs/metrics/merged_logs_labels.csv
+  test_preprocessors: ['sliding_window']
+  n_workers: 1
+  metric_names: ['population','pvi','compactness']
+  # window_size: 5
+  # window_step: 1
+  #slice_bounds: [0,1000]
+  test_proportion:
+    # the proportion of the data to save as test data
+    0.2
+random_seed:
+  42
+
+model:
+  backend: models.keras_nn.KerasSequential
+  type: Sequential
+  layers: 
+      - type: Dense
+        units: 5
+        activation: 'tanh'
+        batch_input_shape: [10,40,4] 4 metrics
+      - type: Dense
+        units: 131
+        activation: 'relu'
+      - type: Flatten
+      - type: Dropout
+        rate: 0.2
+      - type: Dense
+        units: 131
+        activation: 'softmax' # output is weight vector from -1 to 1
+  fit_params:
+    epochs: 10
+  loss: 'mean_squared_error'
+  optimizer: 'adam'
+  metrics: ['mse']

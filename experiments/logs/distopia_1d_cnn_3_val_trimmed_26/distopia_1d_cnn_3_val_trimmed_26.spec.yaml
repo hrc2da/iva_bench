@@ -1,0 +1,65 @@
+experiment_description: pre-standardized. this is INTROSPECTIVE; balancing the class sample size in the test for more accurate accuracy
+experiment_type: experiment_types.classification_experiment.DistopiaClassificationExperiment
+data:
+  backend: data_types.distopia_data.DistopiaData
+  task_labels: 
+    - [-1,-1,0]
+    - [-1,-1,1]
+    - [-1,0,0]
+    - [-1,0,1]
+    - [0,-1,0]
+    - [0,-1,1]
+    - [0,0,1]
+  #training_path: /home/dev/data/distopia/243_raw.pkl
+  training_path: /home/dev/data/distopia/greedy_logs/3_obj/agent4_merged_introspective_standardized.npy
+  training_labels_path: /home/dev/data/distopia/greedy_logs/3_obj/agent_merged_labels.npy
+  preprocessors: # these should be in the order you want them called
+    ['filter_by_task','filter_by_metrics','sliding_window','onehot2class']
+  test_path: /home/dev/data/distopia/team_logs/team4_merged_introspective_standardized.npy
+  test_labels_path: /home/dev/data/distopia/team_logs/team_merged_labels.npy
+  test_preprocessors: ['filter_by_task','filter_by_metrics','sliding_window','onehot2class','balance_samples']
+  balanced_sample_size: 1000
+  #standardization_file: /home/dev/data/distopia/greedy_one_hots_26/standardization_params.pkl
+  window_size: 20
+  n_workers: 1
+  metric_names: ['population','pvi','compactness']
+  # window_size: 5
+  # window_step: 1
+  #slice_bounds: [0,1000]
+  # test_proportion:
+  #   # the proportion of the data to save as test data
+  #   0.2
+random_seed:
+  42
+
+model:
+  backend: models.keras_nn.KerasSequential
+  type: Sequential
+  layers: 
+      - type: Conv1D
+        filters: 64 # don't increase the feature maps
+        kernel_size: 7
+        activation: 'relu'
+        input_shape: [20,4] # 40 steps of 3 outcomes
+      - type: Conv1D
+        filters: 64 # don't increase the feature maps
+        kernel_size: 7
+        stride: 2
+        activation: 'relu'
+      - type: Flatten
+      - type: Dense
+        units: 100
+        activation: 'sigmoid' # output is weight vector from -1 to 1
+      - type: Dense
+        units: 3
+        activation: 'tanh' # output is weight vector from -1 to 1
+      - type: Dropout
+        rate: 0.5
+      - type: Dense
+        units: 7
+        activation: 'softmax'
+  fit_params:
+    epochs: 10
+  loss: 'sparse_categorical_crossentropy'
+  optimizer: 'adam'
+  metrics: ['accuracy']

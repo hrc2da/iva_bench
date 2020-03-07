@@ -1,0 +1,52 @@
+experiment_description: conv3d on only human data
+experiment_type: experiment_types.classification_experiment.DistopiaClassificationExperiment
+data:
+  backend: data_types.distopia_data.DistopiaData
+  #training_path: /home/dev/data/distopia/243_raw.pkl
+  # training_path: /home/dev/data/distopia/100_for_243_design_targets_combined4.npy
+  # training_labels_path: /home/dev/data/distopia/100_for_243_design_labels_combined4.npy
+  # preprocessors: # these should be in the order you want them called
+  #   ['filter_by_metrics','sliding_window','onehot2class', 'conv3dreshape']
+  training_path: /home/dev/data/distopia/team_logs/merged_logs.csv
+  training_labels_path: /home/dev/data/distopia/team_logs/merged_logs_labels.csv
+  preprocessors: ['unflatten_districts','sliding_window','onehot2class', 'conv3dreshape']
+  n_workers: 1
+  metric_names: ['population','pvi','compactness']
+  # window_size: 5
+  # window_step: 1
+  #slice_bounds: [0,1000]
+  test_proportion:
+    # the proportion of the data to save as test data
+    0.2
+random_seed:
+  42
+
+model:
+  backend: models.keras_nn.KerasSequential
+  type: Sequential
+  layers: 
+      - type: Conv3D
+        filters: 64
+        kernel_size: [1,5,5]
+        activation: 'relu'
+        input_shape: [72,8,40,1] # 72 counties + 5 outcomes, 8 districts, 5 steps
+      - type: Conv3D
+        filters: 32
+        kernel_size: [1,4,4]
+        activation: 'relu'
+      - type: Dropout
+        rate: 0.7
+      - type: Flatten
+      - type: Dense
+        units: 100
+        activation: 'tanh' # output is weight vector from -1 to 1
+      - type: Dropout
+        rate: 0.5
+      - type: Dense
+        units: 27
+        activation: 'softmax'
+  fit_params:
+    epochs: 10
+  loss: 'sparse_categorical_crossentropy'
+  optimizer: 'adam'
+  metrics: ['accuracy']

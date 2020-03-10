@@ -39,4 +39,4 @@ class LossHistory(callbacks.Callback):
 
 # add any models you write to this list and __all__
 import models.keras_nn
-__all__ = ['keras_nn']
+__all__ = ['keras_nn','lstm_fcn']

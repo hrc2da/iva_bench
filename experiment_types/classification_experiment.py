@@ -61,13 +61,13 @@ class DistopiaClassificationExperiment(Experiment):
         with open(os.path.join(specs['logpath'],'test_results'),'w+') as outfile:
             outfile.write(result_str)
         predictions = model.predict(x_test)
-        prediction_classes = model.predict_classes(x_test)
+        #prediction_classes = model.predict_classes(x_test)
         np.save(os.path.join(specs['logpath'],'test_predictions'),predictions)
-        np.save(os.path.join(specs['logpath'],'test_prediction_classes'),prediction_classes)
+        #np.save(os.path.join(specs['logpath'],'test_prediction_classes'),prediction_classes)
         np.save(os.path.join(specs['logpath'],'test_labels'),y_test)   
         label_strings = [self.data.task_arr2str(lb) for lb in self.data.task_labels]     
         np.save(os.path.join(specs['logpath'],'task_labels'),label_strings)    
 
-        plot_confusion_matrix(y_test,prediction_classes,labels=label_strings,path=specs['logpath'])
+        #plot_confusion_matrix(y_test,prediction_classes,labels=label_strings,path=specs['logpath'])
 
 
